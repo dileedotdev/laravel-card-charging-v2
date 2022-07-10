@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dinhdjj\CardChargingV2\Tests;
 
+use Dinhdjj\CardChargingV2\Enums\Status;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -11,7 +12,11 @@ class CardChargingV2ServerFaker
 {
     public function __construct(
         public array $cardTypes = [],
+        public int $transId = 0,
     ) {
+        if (!$this->cardTypes) {
+            $this->factoryCardTypes();
+        }
     }
 
     public static function make(
@@ -113,10 +118,6 @@ class CardChargingV2ServerFaker
     public function fakeGetFee(bool $success = true): static
     {
         if ($success) {
-            if (!$this->cardTypes) {
-                $this->factoryCardTypes();
-            }
-
             Http::fake([
                 'thesieure.com/chargingws/v2/getfee*' => fn (Request $request) => Http::response($this->cardTypes),
             ]);
@@ -127,5 +128,61 @@ class CardChargingV2ServerFaker
         }
 
         return $this;
+    }
+
+    public function fakeCharging(Status $status = Status::SUCCESS, int $fees = 30, int $penalty = 40, ?string $message = null): static
+    {
+        Http::fake([
+            'thesieure.com/chargingws/v2' => function (Request $request) use ($status, $fees, $penalty, $message) {
+                if (\in_array($status, [Status::MAINTENANCE, Status::REQUEST_ID_EXISTED, Status::FAILED], true)) {
+                    return Http::response([
+                        'message' => $status->name,
+                        'status' => $message ?? $status->value,
+                    ], 200);
+                }
+
+                $resData = $request->data();
+
+                $data = [
+                    'trans_id' => ++$this->transId,
+                    'request_id' => $resData['request_id'],
+                    'declared_value' => $resData['amount'],
+                    'telco' => $resData['telco'],
+                    'serial' => $resData['serial'],
+                    'code' => $resData['code'],
+                    'status' => $status->value,
+                    'message' => $message ?? $status->name,
+                ];
+
+                if (Status::PENDING === $status) {
+                    $data['amount'] = $resData['amount'] * (100 - $fees) / 100;
+                    $data['value'] = null;
+                }
+
+                if (Status::SUCCESS === $status) {
+                    $data['amount'] = $resData['amount'] * (100 - $fees) / 100;
+                    $data['value'] = $data['declared_value'];
+                }
+
+                if (Status::INCORRECT_VALUE_SUCCESS === $status) {
+                    $data['amount'] = $resData['amount'] * (100 - $fees - $penalty) / 100;
+                    $data['value'] = $data['declared_value'] + 10000;
+                }
+
+                if (Status::INCORRECT_CARD === $status) {
+                    $data['amount'] = 0;
+                    $data['value'] = 0;
+                }
+
+                return Http::response($data);
+            },
+        ]);
+
+        return $this;
+    }
+
+    public function fakeCheck(Status $status = Status::SUCCESS, int $fees = 30, int $penalty = 40): static
+    {
+        return $this->fakeCharging(...\func_get_args());
     }
 }
