@@ -20,9 +20,14 @@ class CardChargingV2ServiceProvider extends PackageServiceProvider
         $package
             ->name('card-charging-v2')
             ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_card-charging-v2_table')
-            ->hasCommand(CardChargingV2Command::class)
+            // ->hasViews()
+            // ->hasMigration('create_card-charging-v2_table')
+            // ->hasCommand(CardChargingV2Command::class)
         ;
+    }
+
+    public function packageBooted(): void
+    {
+        $this->app->bind('card-charging-v2', fn () => new CardChargingV2());
     }
 }
