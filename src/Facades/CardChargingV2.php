@@ -7,8 +7,8 @@ namespace Dinhdjj\CardChargingV2\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \Dinhdjj\Thesieure\Thesieure connection(null|array|string $connection = null)
- * @method static \Dinhdjj\Thesieure\Data\CardType[] getFee()
+ * @method static \Dinhdjj\CardChargingV2\CardChargingV2 connection(null|array|string $connection = null)
+ * @method static \Dinhdjj\CardChargingV2\Data\CardType[] getFee()
  *
  * @see \Dinhdjj\CardChargingV2\CardChargingV2
  */

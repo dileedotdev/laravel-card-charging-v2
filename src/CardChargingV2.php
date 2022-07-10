@@ -33,9 +33,9 @@ class CardChargingV2
     /**
      * Use specific connection.
      */
-    public static function connection(string|array|null $connection = null): static
+    public static function connection(string|array|null $connection = null): self
     {
-        return new static($connection);
+        return new self($connection);
     }
 
     /**
@@ -43,7 +43,7 @@ class CardChargingV2
      *
      * @throws \Illuminate\Http\Client\RequestException
      *
-     * @return \Dinhdjj\Thesieure\Data\CardType[]
+     * @return \Dinhdjj\CardChargingV2\Data\CardType[]
      */
     public function getFee(): array
     {
