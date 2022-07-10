@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dinhdjj\CardChargingV2\Tests;
 
+use Dinhdjj\CardChargingV2\CardChargingV2ServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Dinhdjj\CardChargingV2\CardChargingV2ServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -17,14 +19,7 @@ class TestCase extends Orchestra
         );
     }
 
-    protected function getPackageProviders($app)
-    {
-        return [
-            CardChargingV2ServiceProvider::class,
-        ];
-    }
-
-    public function getEnvironmentSetUp($app)
+    public function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
 
@@ -32,5 +27,12 @@ class TestCase extends Orchestra
         $migration = include __DIR__.'/../database/migrations/create_card-charging-v2_table.php.stub';
         $migration->up();
         */
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return [
+            CardChargingV2ServiceProvider::class,
+        ];
     }
 }

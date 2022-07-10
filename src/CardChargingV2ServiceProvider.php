@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dinhdjj\CardChargingV2;
 
+use Dinhdjj\CardChargingV2\Commands\CardChargingV2Command;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Dinhdjj\CardChargingV2\Commands\CardChargingV2Command;
 
 class CardChargingV2ServiceProvider extends PackageServiceProvider
 {
@@ -20,6 +22,7 @@ class CardChargingV2ServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->hasMigration('create_card-charging-v2_table')
-            ->hasCommand(CardChargingV2Command::class);
+            ->hasCommand(CardChargingV2Command::class)
+        ;
     }
 }
