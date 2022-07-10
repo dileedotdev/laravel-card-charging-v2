@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Dinhdjj\CardChargingV2\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class CardChargingV2Command extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'card-charging-v2';
 
     public $description = 'My command';
 
