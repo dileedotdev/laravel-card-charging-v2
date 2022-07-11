@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Dinhdjj\CardChargingV2;
 
+use Dinhdjj\CardChargingV2\Data\Card;
 use Dinhdjj\CardChargingV2\Data\CardType;
+use Dinhdjj\CardChargingV2\Enums\Status;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
@@ -58,6 +60,78 @@ class CardChargingV2
             fees: (int) $cardType['fees'],
             penalty: (int) $cardType['penalty'],
         ), $response->json());
+    }
+
+    /**
+     * Send card to server for charging/approving.
+     */
+    public function charging(string $telco, int $declaredValue, string $serial, string $code, string $requestId): Card
+    {
+        $url = 'https://'.$this->config('domain').'/chargingws/v2';
+        $res = Http::post($url, [
+            'request_id' => $requestId,
+            'telco' => $telco,
+            'amount' => $declaredValue,
+            'serial' => $serial,
+            'code' => $code,
+            'partner_id' => $this->config('partner_id'),
+            'sign' => $this->generateSign($serial, $code),
+            'command' => 'charging',
+        ])->throw();
+
+        $resData = $res->json();
+
+        return new Card(
+            trans_id: $resData['trans_id'] ?? null,
+            request_id: $requestId,
+            amount: $resData['amount'] ?? null,
+            value: $resData['value'] ?? null,
+            declared_value: $declaredValue,
+            telco: $telco,
+            serial: $serial,
+            code: $code,
+            status: Status::from($resData['status']),
+            message: $resData['message'],
+        );
+    }
+
+    /**
+     * Send card to server to check/update latest status card.
+     */
+    public function check(string $telco, int $declaredValue, string $serial, string $code, string $requestId): Card
+    {
+        $url = 'https://'.$this->config('domain').'/chargingws/v2';
+        $res = Http::post($url, [
+            'telco' => $telco,
+            'amount' => $declaredValue,
+            'serial' => $serial,
+            'code' => $code,
+            'request_id' => $requestId,
+            'partner_id' => $this->config('partner_id'),
+            'sign' => $this->generateSign($serial, $code),
+            'command' => 'check',
+        ])->throw();
+
+        $resData = $res->json();
+
+        return new Card(
+            trans_id: $resData['trans_id'] ?? null,
+            request_id: $requestId,
+            amount: $resData['amount'] ?? null,
+            value: $resData['value'] ?? null,
+            declared_value: $declaredValue,
+            telco: $telco,
+            serial: $serial,
+            code: $code,
+            status: Status::from($resData['status']),
+            message: $resData['message'],
+        );
+    }
+
+    /** Generate sign used when communicate with service server */
+    protected function generateSign(string $serial, string $code): string
+    {
+        return md5($this->config('partner_key').$code.$serial);
     }
 
     /**

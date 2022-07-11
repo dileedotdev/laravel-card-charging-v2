@@ -7,8 +7,10 @@ namespace Dinhdjj\CardChargingV2\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \Dinhdjj\CardChargingV2\CardChargingV2 connection(null|array|string $connection = null)
- * @method static \Dinhdjj\CardChargingV2\Data\CardType[] getFee()
+ * @method static \Dinhdjj\CardChargingV2\CardChargingV2 connection(null|array|string $connection = null)                                        Use specific connection.
+ * @method static \Dinhdjj\CardChargingV2\Data\CardType[] getFee()                                                                               Fetch card types from thesieure.
+ * @method static \Dinhdjj\CardChargingV2\Data\Card charging(string $telco, int $declaredValue, string $serial, string $code, string $requestId) Send card to server for charging/approving.
+ * @method static \Dinhdjj\CardChargingV2\Data\Card check(string $telco, int $declaredValue, string $serial, string $code, string $requestId)    Send card to server to check/update latest status card.
  *
  * @see \Dinhdjj\CardChargingV2\CardChargingV2
  */
