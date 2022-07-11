@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dinhdjj\CardChargingV2\Models;
 
 use Dinhdjj\CardChargingV2\Enums\Status;
+use Dinhdjj\CardChargingV2\Facades\CardChargingV2;
 use Illuminate\Database\Eloquent\Model;
 
 class Card extends Model
@@ -27,5 +28,12 @@ class Card extends Model
     public function getTable(): string
     {
         return config('card-charging-v2.card.table', 'card_charging_v2');
+    }
+
+    public function getSignAttribute(): string
+    {
+        return CardChargingV2::connection($this->getAttribute('connection'))
+            ->generateSign($this->serial, $this->code)
+        ;
     }
 }

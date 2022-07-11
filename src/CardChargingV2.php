@@ -136,7 +136,7 @@ class CardChargingV2
     }
 
     /** Generate sign used when communicate with service server */
-    protected function generateSign(string $serial, string $code): string
+    public function generateSign(string $serial, string $code): string
     {
         return md5($this->config('partner_key').$code.$serial);
     }

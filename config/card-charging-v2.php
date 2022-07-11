@@ -22,4 +22,13 @@ return [
         'table' => 'card_charging_v2',
         'model' => Dinhdjj\CardChargingV2\Models\Card::class,
     ],
+
+    'callback' => [
+        'uri' => 'api/card-charging-v2/callback',
+        'middleware' => ['api'],
+        'name' => 'card-charging-v2-callback',
+        'controller' => Dinhdjj\CardChargingV2\Controllers\CallbackController::class,
+        // Event will dispatch after callback is called (validated callback signature)
+        'event' => Dinhdjj\CardChargingV2\Events\CallbackCalled::class,
+    ],
 ];
