@@ -21,7 +21,7 @@ class CardChargingV2ServiceProvider extends PackageServiceProvider
             ->name('card-charging-v2')
             ->hasConfigFile()
             // ->hasViews()
-            // ->hasMigration('create_card-charging-v2_table')
+            ->hasMigration('create_card_charging_v2_table')
             // ->hasCommand(CardChargingV2Command::class)
         ;
     }

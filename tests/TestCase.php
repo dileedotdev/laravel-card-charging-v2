@@ -23,10 +23,8 @@ class TestCase extends Orchestra
     {
         config()->set('database.default', 'testing');
 
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_card-charging-v2_table.php.stub';
+        $migration = include __DIR__.'/../database/migrations/create_card_charging_v2_table.php.stub';
         $migration->up();
-        */
     }
 
     protected function getPackageProviders($app)
