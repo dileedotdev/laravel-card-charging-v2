@@ -15,6 +15,13 @@ You can install the package via composer:
 composer require dinhdjj/laravel-card-charging-v2
 ```
 
+You can publish and run the migrations with:
+
+```php
+    php artisan vendor:publish --tag="card-charging-v2-migrations"
+    php artisan migrate
+```
+
 You can publish the config file with:
 
 ```bash
@@ -25,14 +32,46 @@ This is the contents of the published config file:
 
 ```php
 return [
+    // Default connection
+    'default' => env('THESIEURE_CONNECTION', 'default'),
+
+    // List config connection
+    'connections' => [
+        'default' => [
+            'domain' => env('THESIEURE_DOMAIN', 'thesieure.com'),
+            'partner_id' => env('THESIEURE_PARTNER_ID'),
+            'partner_key' => env('THESIEURE_PARTNER_KEY'),
+        ],
+    ],
+
+    // Related to card model
+    'card' => [
+        'table' => 'card_charging_v2',
+        'model' => Dinhdjj\CardChargingV2\Models\Card::class,
+    ],
+
+    'callback' => [
+        'uri' => 'api/card-charging-v2/callback',
+        'middleware' => ['api'],
+        'name' => 'card-charging-v2-callback',
+        'controller' => Dinhdjj\CardChargingV2\Controllers\CallbackController::class,
+        // Event will dispatch after callback is called (validated callback signature)
+        'event' => Dinhdjj\CardChargingV2\Events\CallbackCalled::class,
+    ],
 ];
 ```
 
 ## Usage
 
 ```php
-$cardChargingV2 = new Dinhdjj\CardChargingV2();
-echo $cardChargingV2->echoPhrase('Hello, Dinhdjj!');
+use CardChargingV2;
+
+/** @var \Dinhdjj\CardChargingV2\Data\CardType[] */
+$cardTypes =  CardChargingV2::getFee();
+
+/** @var \Dinhdjj\CardChargingV2\Models\Card[] */
+$card = CardChargingV2::charging('VIETTEL', 10000, '1000372684732', '3729473289432', '1');
+$card = CardChargingV2::check('VIETTEL', 10000, '1000372684732', '3729473289432', '1');
 ```
 
 ## Testing
