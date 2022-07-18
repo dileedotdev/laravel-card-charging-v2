@@ -24,6 +24,7 @@ return [
     ],
 
     'callback' => [
+        'methods' => ['get', 'post'], // support: post, get, delete, put
         'uri' => 'api/card-charging-v2/callback',
         'middleware' => ['api'],
         'name' => 'card-charging-v2-callback',

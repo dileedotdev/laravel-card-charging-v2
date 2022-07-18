@@ -37,7 +37,8 @@ class CardChargingV2ServiceProvider extends PackageServiceProvider
 
     protected function registerRoutes(): void
     {
-        foreach (['get', 'post'] as $method) {
+        $methods = config('card-charging-v2.callback.methods', ['get', 'post']);
+        foreach ($methods as $method) {
             Route::$method(
                 uri: config('card-charging-v2.callback.uri', 'api/card-charging-v2/callback'),
                 action: config('card-charging-v2.callback.controller', CallbackController::class)
