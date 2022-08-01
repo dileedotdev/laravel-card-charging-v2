@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dinhdjj\CardChargingV2\Enums;
 
-enum Status :int
+enum Status: int
 {
     case SUCCESS = 1; // Success
 
