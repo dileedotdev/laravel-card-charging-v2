@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Dinhdjj\CardChargingV2;
 
-use Dinhdjj\CardChargingV2\Data\Card;
 use Dinhdjj\CardChargingV2\Data\CardType;
 use Dinhdjj\CardChargingV2\Enums\Status;
+use Dinhdjj\CardChargingV2\Models\Card;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
@@ -62,6 +62,11 @@ class CardChargingV2
         ), $response->json());
     }
 
+    public function getCardModel(): string
+    {
+        return config('card-charging-v2.card.model', Card::class);
+    }
+
     /**
      * Send card to server for charging/approving.
      */
@@ -81,18 +86,19 @@ class CardChargingV2
 
         $resData = $res->json();
 
-        return new Card(
-            trans_id: $resData['trans_id'] ?? null,
-            request_id: $requestId,
-            amount: $resData['amount'] ?? null,
-            value: $resData['value'] ?? null,
-            declared_value: $declaredValue,
-            telco: $telco,
-            serial: $serial,
-            code: $code,
-            status: Status::from($resData['status']),
-            message: $resData['message'],
-        );
+        return $this->getCardModel()::forceCreate([
+            'trans_id' => $resData['trans_id'] ?? null,
+            'request_id' => $requestId,
+            'amount' => $resData['amount'] ?? null,
+            'value' => $resData['value'] ?? null,
+            'declared_value' => $declaredValue,
+            'telco' => $telco,
+            'serial' => $serial,
+            'code' => $code,
+            'status' => Status::from($resData['status']),
+            'message' => $resData['message'],
+            'connection' => $this->connection,
+        ]);
     }
 
     /**
@@ -114,22 +120,23 @@ class CardChargingV2
 
         $resData = $res->json();
 
-        return new Card(
-            trans_id: $resData['trans_id'] ?? null,
-            request_id: $requestId,
-            amount: $resData['amount'] ?? null,
-            value: $resData['value'] ?? null,
-            declared_value: $declaredValue,
-            telco: $telco,
-            serial: $serial,
-            code: $code,
-            status: Status::from($resData['status']),
-            message: $resData['message'],
-        );
+        return $this->getCardModel()::forceCreate([
+            'trans_id' => $resData['trans_id'] ?? null,
+            'request_id' => $requestId,
+            'amount' => $resData['amount'] ?? null,
+            'value' => $resData['value'] ?? null,
+            'declared_value' => $declaredValue,
+            'telco' => $telco,
+            'serial' => $serial,
+            'code' => $code,
+            'status' => Status::from($resData['status']),
+            'message' => $resData['message'],
+            'connection' => $this->connection,
+        ]);
     }
 
     /** Generate sign used when communicate with service server */
-    protected function generateSign(string $serial, string $code): string
+    public function generateSign(string $serial, string $code): string
     {
         return md5($this->config('partner_key').$code.$serial);
     }
